@@ -24,8 +24,8 @@ pipeline {
             }
         }
         stage("build image") { 
-            steps{
-                script{
+            steps {
+                script {
                     buildImage 'oluwasparkle/demo-app:jma-3.0'
 
                 }
