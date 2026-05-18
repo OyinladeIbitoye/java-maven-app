@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 @Library('jenkins-shared-library')
-dev gv
+def gv
 
 pipeline {      
     agent none
