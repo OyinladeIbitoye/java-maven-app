@@ -10,29 +10,29 @@ pipeline {
     }
     stages {
         stage ("init") { 
-            steps{
-                script{
+            steps {
+                script {
                   
                 }
             }
         }
         stage("build jar") { 
-            steps{
-                script{
+            steps {
+                script {
                     buildJar()
                 }
             }
         }
         stage("build image") { 
-            steps{
-                script{
+            steps {
+                script {
                     buildImage()
                 }
             }
         }
         stage("deploy") { 
-            steps{
-                script{
+            steps {
+                script {
                     gv.deployApp()
                 }
             }
