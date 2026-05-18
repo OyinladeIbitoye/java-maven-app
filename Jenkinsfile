@@ -1,7 +1,6 @@
 #!/usr/bin/env groovy
 
 dev gv
-
 pipeline {      
     agent none
     tools {
