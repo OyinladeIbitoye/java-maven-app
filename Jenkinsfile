@@ -9,10 +9,10 @@ pipeline {
         maven 'Maven'
     }
     stages {
-        stage("init") { 
-            steps {
-                script {
-                  gv = load "script.groovy"
+        stage ("init") { 
+            steps{
+                script{
+                  
                 }
             }
         }
@@ -24,9 +24,10 @@ pipeline {
             }
         }
         stage("build image") { 
-            steps {
-                script {
-                    buildImage()
+            steps{
+                script{
+                    buildImage 'oluwasparkle/demo-app:jma-3.0'
+
                 }
             }
         }
