@@ -19,14 +19,14 @@ pipeline {
         stage("build jar") { 
             steps {
                 script {
-                    gv.buildJar()
+                    buildJar()
                 }
             }
         }
         stage("build image") { 
             steps {
                 script {
-                    gv.buildImage()
+                    buildImage 'oluwasparkle/demo-app:jma-3.0'
                 }
             }
         }
