@@ -9,7 +9,7 @@ pipeline {
         maven 'Maven'
     }
     stages {
-        stage ("init") { 
+        stage("init") { 
             steps {
                 script {
                   
