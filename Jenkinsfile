@@ -1,68 +1,44 @@
-pipeline {   
-    
-HEAD
-    agent none
+#!/usr/bin/env groovy
 
+// library identifier: 'jenkins-shared-library@master', retriever: modernSCM(
+//     [$class: 'GitSCMSource',
+//      remote: 'https://github.com/OyinladeIbitoye/jenkins-shared-library.git',
+//      credentialsId: 'github-credentials'
+//     ]
+// )
+// def gv
+pipeline {      
     agent any
     tools {
         maven 'Maven'
     }
-e68bd10490e29bb8a078c5c72a3dedb8019e9931
     stages {
-        stage('test') {
+        stage ('build app') { 
             steps {
                 script {
-                    echo "Testing the application..."
-                    echo "Executing pipeline for branch $BRANCH_NAME"
+                    echo "building the application.."
+                    sh 'mvn package'
                 }
             }
         }
-HEAD
-        stage('build') { 
-            when {
-                expression {
-                    BRANCH_NAME == 'master'
-                }
-            }
-            steps {
-               script {
-                   echo "Building the application..."
-=======
-        stage("build jar") { 
-            steps {
-               script {
-                   gv.buildJar()
->>>>>>> e68bd10490e29bb8a078c5c72a3dedb8019e9931
-                }
-            }
-        }
-
-<<<<<<< HEAD
-        stage('deploy') {
-            when {
-                expression {
-                    BRANCH_NAME == 'master'
-=======
         stage("build image") { 
             steps {
-               script {
-                    gv.buildImage()
->>>>>>> e68bd10490e29bb8a078c5c72a3dedb8019e9931
+                script {
+                   echo "building the docker image..."
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-repo', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                        sh 'docker build -t oluwasparkle/demo-app:jma-2.0 .'
+                        sh "echo $PASS | docker login -u $USER --password-stdin"
+                        sh 'docker push oluwasparkle/demo-app:jma-2.0'
+                    }
                 }
             }
+        }   
+        stage("deploy") { 
             steps {
                 script {
-<<<<<<< HEAD
-                   echo "Deploying the application..."
-=======
-                   gv.deployApp()
->>>>>>> e68bd10490e29bb8a078c5c72a3dedb8019e9931
-               }
+                    echo 'deploying docker image to EC2...'
+                }
             }
-        }         
-    }
-<<<<<<< HEAD
+        }
+    }    
 }
-=======
-}
->>>>>>> e68bd10490e29bb8a078c5c72a3dedb8019e9931
