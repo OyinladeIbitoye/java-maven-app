@@ -58,17 +58,19 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                        // sh 'git config --global user.email "jenkins@example.com"'
-                        // sh 'git config --global user.name "jenkins"'
+                        sh 'git checkout jenkins-jobs'
+                        sh 'git config user.email "jenkins@example.com"'
+                        sh 'git config user.name "jenkins"'
 
-                        // sh 'git status'
-                        // sh 'git branch'
-                        // sh 'git config --list'
-
-                        sh 'git remote set-url origin https://${USER}:${PASS}@github.com/OyinladeIbitoye/java-maven-app.git'
                         sh 'git add .'
                         sh 'git commit -m "ci: version bump" || true'
-                        sh 'git push origin HEAD:jenkins-jobs'
+
+                        sh 'git push https://$USER:$PASS@github.com/OyinladeIbitoye/java-maven-app.git HEAD:jenkins-jobs'
+
+                        // sh 'git remote set-url origin https://${USER}:${PASS}@github.com/OyinladeIbitoye/java-maven-app.git'
+                        // sh 'git add .'
+                        // sh 'git commit -m "ci: version bump" || true'
+                        // sh 'git push origin HEAD:jenkins-jobs'
                     }
                 }
             }
