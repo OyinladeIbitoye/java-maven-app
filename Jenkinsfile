@@ -58,7 +58,6 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                        sh 'git checkout jenkins-jobs'
                         sh 'git config user.email "jenkins@example.com"'
                         sh 'git config user.name "jenkins"'
 
