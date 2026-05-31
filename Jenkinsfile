@@ -18,6 +18,9 @@ pipeline {
     stages {
         stage('checkout') {
             steps {
+                // Discard pom.xml changes left by a previous failed build
+                sh 'git reset --hard HEAD 2>/dev/null || true'
+                sh 'git clean -fd 2>/dev/null || true'
                 git branch: 'jenkins-jobs',
                      credentialsId: 'github-credentials',
                      url: 'https://github.com/OyinladeIbitoye/java-maven-app.git'
