@@ -56,24 +56,18 @@ pipeline {
         stage('commit version update') {
             steps {
                 script {
-                    sshagent(credentials: ['github-ssh']) {
-                        sh '''
-                            git config user.email "jenkins@example.com"
-                            git config user.name "jenkins"
+                    withCredentials([usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                        sh 'git config --global user.email "jenkins@example.com"'
+                        sh 'git config --global user.name "jenkins"'
 
-                            git remote set-url origin git@github.com:OyinladeIbitoye/java-maven-app.git
-
-                            # ALWAYS start clean on correct branch
-                            git fetch origin
-                            git checkout -B jenkins-jobs origin/jenkins-jobs
-
-                            git status
-
-                            git add pom.xml
-                            git commit -m "ci: version bump" || echo "No changes to commit"
-
-                            git push origin jenkins-jobs
-                        '''
+                        sh 'git status'
+                        sh 'git branch'
+                        sh 'git config --list'
+                        
+                        sh 'git remote set-url origin https://${USER}:${PASS}@github.com/OyinladeIbitoye/java-maven-app.git'
+                        sh 'git add .'
+                        sh 'git commit -m "ci: version bump"'
+                        sh 'git push origin HEAD:jenkins-jobs'
                     }
                 }
             }
