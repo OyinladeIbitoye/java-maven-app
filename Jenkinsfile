@@ -9,12 +9,15 @@
 // def gv
 pipeline {      
     agent any
+    // remove
     options {
         skipDefaultCheckout(true)
     }
+    // real
     tools {
         maven 'Maven'
     }
+    // remove
     stages {
         stage('checkout') {
             steps {
@@ -26,6 +29,7 @@ pipeline {
                      url: 'https://github.com/OyinladeIbitoye/java-maven-app.git'
             }
         }
+        // the real 
         stage('increment version') {
             steps {
                 script {
