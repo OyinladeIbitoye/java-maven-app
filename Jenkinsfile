@@ -9,10 +9,20 @@
 // def gv
 pipeline {      
     agent any
+    options {
+        skipDefaultCheckout(true)
+    }
     tools {
         maven 'Maven'
     }
     stages {
+        stage('checkout') {
+            steps {
+                git branch: 'jenkins-jobs',
+                     credentialsId: 'github-credentials',
+                     url: 'https://github.com/OyinladeIbitoye/java-maven-app.git'
+            }
+        }
         stage('increment version') {
             steps {
                 script {
