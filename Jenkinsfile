@@ -1,79 +1,51 @@
 #!/usr/bin/env groovy
 
-// library identifier: 'jenkins-shared-library@master', retriever: modernSCM(
-//     [$class: 'GitSCMSource',
-//      remote: 'https://github.com/OyinladeIbitoye/jenkins-shared-library.git',
-//      credentialsId: 'github-credentials'
-//     ]
-// )
-// def gv
+library identifier: 'jenkins-shared-library@master', retriever: modernSCM(
+    [$class: 'GitSCMSource',
+     remote: 'https://github.com/OyinladeIbitoye/jenkins-shared-library.git',
+     credentialsId: 'github-credentials'
+    ]
+)
+
 pipeline {      
     agent any
     tools {
         maven 'Maven'
     }
+    environment {
+        IMAGE_NAME = 'oluwasparkle/demo-app:jma-3.0'
+    }
+
     stages {
-        // the real 
-        stage('increment version') {
-            steps {
-                script {
-                    echo 'incrementing app version...'
-                    sh 'mvn build-helper:parse-version versions:set \
-                        -DnewVersion=\\\${parsedVersion.majorVersion}.\\\${parsedVersion.minorVersion}.\\\${parsedVersion.nextIncrementalVersion} \
-                        versions:commit' 
-                    def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
-                    def version = matcher[0][1]
-                    env.IMAGE_NAME = "$version-$BUILD_NUMBER"
-                }
-            }
-        }
         stage ('build app') { 
             steps {
                 script {
-                    echo "building the application.."
-                    sh 'mvn clean package'
+                  echo 'building applicatin jar...'
+                  buildJar()
                 }
             }
         }
         stage('build image') { 
             steps {
                 script {
-                   echo "building the docker image..."
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-repo', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                        sh "docker build -t oluwasparkle/demo-app:${IMAGE_NAME} ."
-                        sh "echo $PASS | docker login -u $USER --password-stdin"
-                        sh "docker push oluwasparkle/demo-app:${IMAGE_NAME}"
-                    }
+                    echo 'building docker image...'
+                    buildImage(env.IMAGE_NAME)
+                    dockerLogin()
+                    dockerPush(env.IMAGE_NAME)
                 }
             }
-        }   
-        stage('deploy') { 
+        }
+        stage('deploy') {
             steps {
                 script {
                     echo 'deploying docker image to EC2...'
-                }
-            }
-        }
-        stage('commit version update') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                        sh 'git config user.email "jenkins@example.com"'
-                        sh 'git config user.name "jenkins"'
-
-                        sh 'git add .'
-                        sh 'git commit -m "ci: version bump" || true'
-
-                        sh 'git push https://$USER:$PASS@github.com/OyinladeIbitoye/java-maven-app.git HEAD:jenkins-jobs'
-
-                        // sh 'git remote set-url origin https://${USER}:${PASS}@github.com/OyinladeIbitoye/java-maven-app.git'
-                        // sh 'git add .'
-                        // sh 'git commit -m "ci: version bump" || true'
-                        // sh 'git push origin HEAD:jenkins-jobs'
+                    def dockerComposeCmd = "docker-compose -f docker-compose.yaml up --detach"
+                    sshagent(['ec2-server-key']) {
+                        sh "scp docker-compose.yaml ec2-user@13.38.35.42:/home/ec2-user"
+                        sh "ssh -o StrictHostKeyChecking=no ec2-user@13.38.35.42 ${dockerComposeCmd}"
                     }
                 }
             }
-        }
-
+        }     
     }    
 }
